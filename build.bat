@@ -21,11 +21,8 @@ echo ✅ All required files found
 
 echo.
 echo [2/3] Building application with PyInstaller...
-echo 🧹 Cleaning previous builds...
 rmdir /s /q build 2>nul
 rmdir /s /q __pycache__ 2>nul
-
-echo 🔨 Starting optimized build...
 pyinstaller QRScanner.spec --clean
 
 if %ERRORLEVEL% neq 0 (

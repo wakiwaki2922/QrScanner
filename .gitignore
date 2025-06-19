@@ -154,10 +154,10 @@ thumbs.db
 Thumbs.db
 Desktop.ini
 
-# Screenshot and temp files for QR Scanner
+# Application specific
+*.exe
 screenshots/
 temp_images/
-# *.png  # Comment out - we need icon files
 *.jpg
 *.jpeg
 *.bmp
@@ -165,27 +165,9 @@ temp_images/
 *.tiff
 *.webp
 
-# Specific temporary files to ignore
-icon_preview.png
-create_better_icon.py  # Only needed once to generate icon
-
-# Application specific
-*.sqlite3
-*.db
-config.ini
-settings.json
-
-# Build outputs for executables
-*.exe
-*.app
-*.deb
-*.rpm
-*.msi
-
-# Self-signing certificates (NEVER commit these!)
+# Certificates
 *.pfx
 *.p12
-QRScannerCert.*
 
 # Logs
 logs/
