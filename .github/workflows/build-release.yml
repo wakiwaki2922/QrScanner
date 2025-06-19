@@ -36,20 +36,14 @@ jobs:
 
       # Bước 4: Build ứng dụng thành file .exe bằng PyInstaller
       - name: Build with PyInstaller
-        run: pyinstaller --onefile --windowed --name QRScanner qr_scanner_app.py
+        run: pyinstaller QRScanner.spec
 
       # Bước 5: Upload file .exe lên mục Assets của Release
       # Action này sẽ tự động tìm file .exe và đính kèm vào release đã kích hoạt workflow
       - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v2
         with:
-          # Lấy URL để upload từ chính sự kiện release đã kích hoạt workflow
-          upload_url: ${{ github.event.release.upload_url }}
           # Đường dẫn tới file .exe trong thư mục 'dist' do PyInstaller tạo ra
-          asset_path: ./dist/QRScanner.exe
-          # Tên của file sẽ hiển thị trên trang Release
-          asset_name: QRScanner-${{ github.ref_name }}.exe
-          # Loại nội dung của file
-          asset_content_type: application/vnd.microsoft.portable-executable
+          files: ./dist/QRScanner.exe
+          # Tên của file sẽ hiển thị trên trang Release  
+          name: QRScanner-${{ github.ref_name }}.exe

@@ -34,7 +34,10 @@ MANIFEST
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
-*.spec
+# *.spec  # Comment out - we need QRScanner.spec
+warn-*.txt
+xref-*.html
+*.spec.backup
 
 # Installer logs
 pip-log.txt
@@ -154,13 +157,17 @@ Desktop.ini
 # Screenshot and temp files for QR Scanner
 screenshots/
 temp_images/
-*.png
+# *.png  # Comment out - we need icon files
 *.jpg
 *.jpeg
 *.bmp
 *.gif
 *.tiff
 *.webp
+
+# Specific temporary files to ignore
+icon_preview.png
+create_better_icon.py  # Only needed once to generate icon
 
 # Application specific
 *.sqlite3

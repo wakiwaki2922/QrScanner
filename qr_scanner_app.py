@@ -85,8 +85,11 @@ class MainApp(QWidget):
 
     def init_ui(self):
         """Khởi tạo giao diện người dùng."""
-        self.setWindowTitle("Trình quét mã QR")
+        self.setWindowTitle("🔍 QR Scanner Pro - Quét mã QR siêu nhanh")
         self.setFixedSize(350, 200)
+        
+        # Thiết lập icon cho ứng dụng
+        self.setup_app_icon()
         self.setStyleSheet("""
             QWidget {
                 background-color: #263238; /* Nền xám đen */
@@ -136,6 +139,58 @@ class MainApp(QWidget):
         self.setLayout(layout)
         self.center_window()
         self.show()
+
+    def setup_app_icon(self):
+        """Thiết lập icon cho ứng dụng từ embedded resources hoặc file"""
+        import os
+        import sys
+        from PyQt5.QtGui import QPixmap
+        
+        # Tạo icon từ code (fallback nếu không có file)
+        def create_icon_from_code():
+            pixmap = QPixmap(32, 32)
+            pixmap.fill(QColor(66, 165, 245))  # Màu xanh dương chính
+            painter = QPainter(pixmap)
+            painter.setPen(QPen(QColor(255, 255, 255), 2))
+            # Vẽ khung QR đơn giản
+            painter.drawRect(4, 4, 24, 24)
+            painter.drawRect(6, 6, 8, 8)
+            painter.drawRect(18, 6, 8, 8)
+            painter.drawRect(6, 18, 8, 8)
+            painter.end()
+            return QIcon(pixmap)
+        
+        try:
+            # Thử các path khác nhau
+            possible_paths = [
+                'icon.ico',
+                os.path.join(os.path.dirname(__file__), 'icon.ico'),
+                os.path.join(sys._MEIPASS, 'icon.ico') if hasattr(sys, '_MEIPASS') else '',
+                os.path.join(os.path.dirname(sys.executable), 'icon.ico')
+            ]
+            
+            icon_loaded = False
+            for path in possible_paths:
+                if path and os.path.exists(path):
+                    icon = QIcon(path)
+                    if not icon.isNull():
+                        self.setWindowIcon(icon)
+                        # Thiết lập cho toàn bộ app (bao gồm taskbar)
+                        QApplication.instance().setWindowIcon(icon)
+                        icon_loaded = True
+                        break
+            
+            if not icon_loaded:
+                # Fallback: tạo icon từ code
+                icon = create_icon_from_code()
+                self.setWindowIcon(icon)
+                QApplication.instance().setWindowIcon(icon)
+                
+        except Exception as e:
+            # Fallback cuối cùng
+            icon = create_icon_from_code()
+            self.setWindowIcon(icon)
+            QApplication.instance().setWindowIcon(icon)
 
     def center_window(self):
         """Canh giữa cửa sổ ứng dụng trên màn hình."""
@@ -195,7 +250,13 @@ class MainApp(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    # Bạn có thể đặt icon cho ứng dụng tại đây
-    # app.setWindowIcon(QIcon('path/to/your/icon.png'))
+    
+    # Thiết lập App ID để Windows nhận diện đúng trên taskbar
+    try:
+        import ctypes
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('QRScannerPro.QRScanner.1.0')
+    except:
+        pass
+    
     ex = MainApp()
     sys.exit(app.exec_())
