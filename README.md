@@ -1,39 +1,26 @@
-# 🔍 QR Scanner - Trình Quét Mã QR
+# QR Scanner
 
-Ứng dụng quét mã QR từ màn hình máy tính đơn giản và nhanh chóng.
+Quét mã QR từ màn hình máy tính.
 
-## 📦 Tải về
+## Tải về
 
-Tải file `.exe` từ [Releases](../../releases) hoặc [Actions](../../actions) cho bản development.
+Download file `.exe` từ [Releases](../../releases)
 
-## Tính năng chính
+## Tính năng
 
-- Quét mã QR từ bất kỳ vùng nào trên màn hình
-- Tự động sao chép nội dung mã QR vào clipboard
-- Giao diện đơn giản, dễ sử dụng
-- Hỗ trợ chọn vùng quét linh hoạt
+- Quét QR code từ màn hình
+- Tự động copy vào clipboard
+- Giao diện đơn giản
 
-## Build từ Source
+## Build
 
-### Yêu cầu
-- Python 3.7+
-- Windows 10/11
-
-### Cách build
 ```bash
-# Cài đặt dependencies
-pip install -r requirements.txt
-pip install pyinstaller
-
-# Build
 build.bat
-# hoặc
-pyinstaller QRScanner.spec --clean
 ```
 
-File exe sẽ được tạo trong thư mục `dist/`
+## Chạy từ source
 
-### Chạy từ source
 ```bash
+pip install -r requirements.txt
 python qr_scanner_app.py
 ``` 
