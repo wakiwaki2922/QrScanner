@@ -1,0 +1,51 @@
+# Tên của quy trình làm việc, sẽ hiển thị trong tab "Actions" trên GitHub
+name: Build Executable
+
+# Điều kiện kích hoạt: chạy quy trình này khi một bản phát hành (release) mới được tạo
+on:
+  release:
+    types: [created]
+
+# Các công việc (jobs) cần thực hiện
+jobs:
+  build:
+    # Chạy trên một máy ảo Windows mới nhất do GitHub cung cấp
+    runs-on: windows-latest
+
+    steps:
+      # Bước 1: Lấy mã nguồn từ repository về máy ảo
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Bước 2: Cài đặt Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9' # Bạn có thể đổi phiên bản Python nếu muốn
+
+      # Bước 3: Cài đặt các thư viện Python cần thiết
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      # Bước 4: Build ứng dụng thành file .exe bằng PyInstaller
+      - name: Build with PyInstaller
+        run: pyinstaller --onefile --windowed --name QRScanner qr_scanner_app_py.py
+
+      # Bước 5: Upload file .exe lên mục Assets của Release
+      # Action này sẽ tự động tìm file .exe và đính kèm vào release đã kích hoạt workflow
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # Lấy URL để upload từ chính sự kiện release đã kích hoạt workflow
+          upload_url: ${{ github.event.release.upload_url }}
+          # Đường dẫn tới file .exe trong thư mục 'dist' do PyInstaller tạo ra
+          asset_path: ./dist/QRScanner.exe
+          # Tên của file sẽ hiển thị trên trang Release
+          asset_name: QRScanner-${{ github.ref_name }}.exe
+          # Loại nội dung của file
+          asset_content_type: application/vnd.microsoft.portable-executable
