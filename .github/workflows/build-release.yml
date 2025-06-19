@@ -32,7 +32,7 @@ jobs:
 
       # Bước 4: Build ứng dụng thành file .exe bằng PyInstaller
       - name: Build with PyInstaller
-        run: pyinstaller --onefile --windowed --name QRScanner qr_scanner_app_py.py
+        run: pyinstaller --onefile --windowed --name QRScanner qr_scanner_app.py
 
       # Bước 5: Upload file .exe lên mục Assets của Release
       # Action này sẽ tự động tìm file .exe và đính kèm vào release đã kích hoạt workflow
