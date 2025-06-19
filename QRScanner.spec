@@ -1,10 +1,16 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+from PyInstaller.utils.hooks import collect_data_files, collect_dynamic_libs
+
+# Thu thập thư viện pyzbar
+pyzbar_datas = collect_data_files('pyzbar')
+pyzbar_binaries = collect_dynamic_libs('pyzbar')
+
 a = Analysis(
     ['qr_scanner_app.py'],
     pathex=[],
-    binaries=[],
-    datas=[],
+    binaries=pyzbar_binaries,
+    datas=pyzbar_datas,
     hiddenimports=['pyzbar'],
     hookspath=[],
     hooksconfig={},
