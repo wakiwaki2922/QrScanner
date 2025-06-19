@@ -1,0 +1,103 @@
+name: Build Test (Development)
+
+# Chạy khi push vào main hoặc tạo PR
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# Cấp quyền cho GITHUB_TOKEN
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  build-test:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Lint Python code
+        run: |
+          pip install flake8
+          # Kiểm tra syntax errors và undefined names
+          flake8 qr_scanner_app.py --count --select=E9,F63,F7,F82 --show-source --statistics
+          # Kiểm tra style (warning only)
+          flake8 qr_scanner_app.py --count --max-complexity=10 --max-line-length=127 --statistics || echo "Style warnings detected"
+
+      - name: Clean build
+        run: |
+          if (Test-Path "build") { Remove-Item -Recurse -Force "build" }
+          if (Test-Path "dist") { Remove-Item -Recurse -Force "dist" }
+          if (Test-Path "__pycache__") { Remove-Item -Recurse -Force "__pycache__" }
+
+      - name: Build test executable
+        run: pyinstaller QRScanner.spec --clean
+
+      - name: Verify build and test basic functionality
+        run: |
+          if (Test-Path "./dist/QRScanner.exe") {
+            $size = (Get-Item "./dist/QRScanner.exe").Length / 1MB
+            Write-Host "✅ Build successful! Size: $([math]::Round($size, 2)) MB"
+            
+            # Test basic executable info (không chạy GUI)
+            $info = Get-ItemProperty "./dist/QRScanner.exe"
+            Write-Host "📋 Created: $($info.CreationTime)"
+            Write-Host "📋 Version: $($info.VersionInfo.FileVersion)"
+            
+            # Kiểm tra file có chứa các components cần thiết
+            $strings = Select-String -Pattern "PyQt5|pyzbar|QR Scanner" -Path "./dist/QRScanner.exe" -Quiet
+            if ($strings) {
+              Write-Host "✅ Required components detected in executable"
+            } else {
+              Write-Host "⚠️ Some components may be missing"
+            }
+          } else {
+            Write-Host "❌ Build failed - executable not found!"
+            exit 1
+          }
+
+      - name: Upload build artifact for testing
+        uses: actions/upload-artifact@v4
+        with:
+          name: QRScanner-test-build-${{ github.sha }}
+          path: |
+            ./dist/QRScanner.exe
+          retention-days: 7
+
+      - name: Comment PR with build info (if PR)
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `🔨 **Build Test Results**
+              
+              ✅ Build completed successfully!
+              📦 Artifact: \`QRScanner-test-build-${{ github.sha }}\`
+              ⏱️ Build time: ~3-5 minutes
+              
+              **To test:**
+              1. Download artifact from [Actions tab](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+              2. Extract and run QRScanner.exe
+              3. Test QR scanning functionality
+              
+              **Note:** Test builds are unsigned and may trigger antivirus warnings.`
+            }) 

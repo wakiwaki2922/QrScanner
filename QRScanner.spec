@@ -8,9 +8,10 @@ from PyInstaller.utils.hooks import collect_data_files, collect_dynamic_libs
 pyzbar_datas = collect_data_files('pyzbar')
 pyzbar_binaries = collect_dynamic_libs('pyzbar')
 
-# Thêm icon vào resources
+# Thêm icon và manifest vào resources
 added_files = [
     ('icon.ico', '.'),  # Copy icon.ico vào thư mục gốc của exe
+    ('QRScanner.manifest', '.'),  # Copy manifest
 ]
 
 a = Analysis(
@@ -22,7 +23,13 @@ a = Analysis(
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[],
+    excludes=[
+        'tkinter', 'matplotlib', 'numpy.f2py', 'scipy', 'unittest', 
+        'email', 'http', 'urllib3', 'xml', 'pydoc', 'doctest',
+        'argparse', 'logging.handlers', 'multiprocessing.spawn',
+        'sqlite3', 'ssl', 'bz2', 'lzma', '_hashlib', '_ssl',
+        'test', 'tests', 'distutils'
+    ],
     noarchive=False,
     optimize=0,
 )
@@ -38,8 +45,8 @@ exe = EXE(
     name='QRScanner',
     debug=False,
     bootloader_ignore_signals=False,
-    strip=False,
-    upx=True,
+    strip=True,
+    upx=False,
     upx_exclude=[],
     runtime_tmpdir=None,
     console=False,

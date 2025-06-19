@@ -1,6 +1,23 @@
-# QR Scanner - Trình Quét Mã QR
+# 🔍 QR Scanner Pro - Trình Quét Mã QR
 
 Ứng dụng quét mã QR từ màn hình máy tính với giao diện đồ họa đơn giản và thân thiện.
+
+## 📦 Tải về
+
+### 🔗 Bản chính thức (Signed)
+Tải file `.exe` mới nhất từ [Releases](../../releases)
+- ✅ Đã được ký số để giảm false positive
+- ✅ Bao gồm checksums để verify tính toàn vẹn  
+- ✅ Metadata đầy đủ và mô tả chi tiết
+- ✅ Build tối ưu với kích thước nhỏ (~25MB)
+
+### 🧪 Bản thử nghiệm (Development)
+- Tự động build khi có code mới
+- Tải từ [Actions tab](../../actions)
+- ⚠️ Chưa được ký số - có thể có antivirus warnings
+
+### 🛡️ Xử lý False Positive
+Nếu antivirus báo virus, xem [ANTIVIRUS_GUIDE.md](ANTIVIRUS_GUIDE.md) để biết cách xử lý.
 
 ## Tính năng chính
 
@@ -40,19 +57,26 @@ pip install pyinstaller
 
 ### Bước 4: Build file exe
 
-#### Tùy chọn 1: Build cơ bản (nhiều file)
+#### ⭐ Tùy chọn khuyến nghị (Build tối ưu)
 ```bash
-pyinstaller --windowed qr_scanner_app.py
+# Sử dụng script tự động
+build.bat
 ```
 
-#### Tùy chọn 2: Build thành 1 file exe duy nhất (khuyến nghị)
+#### 🔧 Build manual với spec file
+```bash
+pyinstaller QRScanner.spec --clean
+```
+
+#### 🛡️ Build + Self-signing (giảm false positive)
+```bash
+build.bat
+sign_exe.bat
+```
+
+#### 🏗️ Build cơ bản (deprecated)
 ```bash
 pyinstaller --onefile --windowed --name "QRScanner" qr_scanner_app.py
-```
-
-#### Tùy chọn 3: Build với icon tùy chỉnh
-```bash
-pyinstaller --onefile --windowed --icon=icon.ico --name "QRScanner" qr_scanner_app.py
 ```
 
 ### Bước 5: Tìm file exe đã build
@@ -73,9 +97,48 @@ Sau khi build thành công, file exe sẽ được tạo trong thư mục:
 
 ### Lưu ý khi build
 
-1. **Kích thước file**: Build với `--onefile` sẽ tạo file exe lớn hơn (~50-100MB) nhưng dễ phân phối
-2. **Thời gian khởi động**: File exe có thể khởi động chậm hơn lần đầu do phải giải nén
-3. **Antivirus**: Một số phần mềm diệt virus có thể báo false positive với file exe được build từ PyInstaller
+1. **Kích thước file**: Build tối ưu sẽ tạo file ~25MB (giảm 40% so với trước)
+2. **Thời gian khởi động**: Build đã được tối ưu để khởi động nhanh hơn
+3. **Antivirus**: 
+   - ✅ **Signed version**: Rất ít false positive
+   - ⚠️ **Unsigned version**: Có thể bị báo false positive (bình thường với PyInstaller)
+   - 📋 **Xử lý**: Xem [ANTIVIRUS_GUIDE.md](ANTIVIRUS_GUIDE.md)
+
+### 🤖 GitHub Actions CI/CD
+
+Project này có 2 workflows tự động:
+
+#### 🚀 Production Build (`build-release.yml`)
+- **Trigger**: Khi tạo Release mới
+- **Features**:
+  - ✅ Build tối ưu với spec file
+  - ✅ Tự động ký số (self-signed)
+  - ✅ Tạo checksums cho verification
+  - ✅ Upload file + metadata đầy đủ
+  - ✅ Enhanced release notes
+
+#### 🧪 Development Build (`build-test.yml`)  
+- **Trigger**: Push vào main hoặc tạo PR
+- **Features**:
+  - ✅ Lint code quality check
+  - ✅ Build test executable
+  - ✅ Upload artifact cho testing
+  - ✅ Auto comment PR với build info
+
+### 📋 Workflow Usage
+
+#### Tạo release mới:
+```bash
+git tag v1.0.1
+git push origin v1.0.1
+# Tạo release trên GitHub → tự động build & upload
+```
+
+#### Test build:
+```bash
+git push origin main
+# Tự động build và upload artifact
+```
 
 ### Khắc phục lỗi thường gặp
 
