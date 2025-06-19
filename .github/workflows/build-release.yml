@@ -6,6 +6,10 @@ on:
   release:
     types: [created]
 
+# Cấp quyền cho GITHUB_TOKEN
+permissions:
+  contents: write
+
 # Các công việc (jobs) cần thực hiện
 jobs:
   build:
